@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tap & Earn</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #coin-count, #balance {
+      font-size: 1.5em;
+      margin: 5px 0;
+    }
+
+    #tap-button {
+      padding: 20px 40px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffcc00;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 5px #c9a000;
+      transition: all 0.2s ease;
+    }
+
+    #tap-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px #c9a000;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    .controls button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #withdraw-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #reset-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 1.2em;
+      color: yellow;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>💸 Tap & Earn</h1>
+  <div id="coin-count">Coins: 0</div>
+  <div id="balance">Balance: $0.00</div>
+  <button id="tap-button">Tap to Earn</button>
+
+  <div class="controls">
+    <button id="withdraw-btn">Withdraw</button>
+    <button id="reset-btn">Reset</button>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    let coins = 0;
+    const TELEGRAM_BOT_TOKEN = "7782600997:AAHkI0CBrgQqeFdykaI7qFWMEECYImmd00M"; // ✅ Your bot token
+    const TELEGRAM_CHAT_ID = "6940101627"; // ✅ Your chat ID
+    const coinDisplay = document.getElementById("coin-count");
+    const balanceDisplay = document.getElementById("balance");
+    const message = document.getElementById("message");
+
+    document.getElementById("tap-button").addEventListener("click", () => {
+      coins++;
+      updateDisplay();
+    });
+
+    document.getElementById("withdraw-btn").addEventListener("click", () => {
+      const balance = coins * 0.01;
+
+      if (balance >= 1) {
+        sendWithdrawal(balance);
+      } else {
+        message.textContent = "❌ You need at least $1 to withdraw.";
+      }
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      coins = 0;
+      message.textContent = "🔄 Coins reset.";
+      updateDisplay();
+    });
+
+    function updateDisplay() {
+      coinDisplay.textContent = `Coins: ${coins}`;
+      balanceDisplay.textContent = `Balance: $${(coins * 0.01).toFixed(2)}`;
+    }
+
+    function sendWithdrawal(amount) {
+      const text = `🤑 New withdrawal request:\nCoins: ${coins}\nAmount: $${amount.toFixed(2)}\nUser: Tap & Earn Player`;
+      const url = `https://cors-anywhere.herokuapp.com/https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: text
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          message.textContent = `✅ Withdrawal of $${amount.toFixed(2)} sent to Telegram!`;
+          coins = 0;
+          updateDisplay();
+        } else {
+          message.textContent = "❌ Telegram API error!";
+        }
+      })
+      .catch(err => {
+        message.textContent = "⚠️ Network or CORS issue!";
+        console.error(err);
+      });
+    }
+
+    updateDisplay();
+  </script>
+
+</body>
+</html>
