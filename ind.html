@@ -125,6 +125,7 @@
       text-align: center;
     }
   </style>
+ <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 <div class="top-bar">
@@ -390,6 +391,20 @@
   }
 
   updateDisplay();
+
+// Telegram WebApp integration
+let tg = window.Telegram.WebApp;
+tg.expand();
+
+const telegramUser = tg.initDataUnsafe?.user;
+
+if (telegramUser) {
+  const userInfo = document.createElement("div");
+  userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
+  userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong> <br>🆔 ID: ${telegramUser.id} <br>📛 Username: @${telegramUser.username || "none"}`;
+  document.body.insertBefore(userInfo, document.body.firstChild);
+  console.log("Logged in Telegram User:", telegramUser);
+}
 </script>
 </body>
 </html>
