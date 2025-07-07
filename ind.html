@@ -241,16 +241,31 @@
   <div id="message"></div>
 </div>
 
-<!-- Bottom Navigation -->
+<!-- Refer and Earn Page -->
+<div id="refer" class="page">
+  <div class="section-title">🤝 Refer & Earn $5</div>
+  <p style="text-align: center;">
+    Invite your friends to use DiceMint! You’ll earn <strong>$5</strong> when they join using your link.<br><br>
+    🔗 Your Referral Link:
+  </p>
+  <input type="text" id="refLink" readonly style="text-align:center;" />
+  <button onclick="copyRefLink()" style="margin: 10px auto; display:block; background:#00ff99; color:#000; padding:10px; border:none; border-radius:8px;">
+    📋 Copy Link
+  </button>
+  <p id="copyMsg" style="text-align:center; font-size: 0.9em;"></p>
+</div>
+
+<!-- Add this to your bottom navigation -->
 <div class="bottom-nav">
   <button onclick="showPage('home')">🎲<span>Bet</span></button>
   <button onclick="showPage('withdraw')">💵<span>Withdraw</span></button>
   <button onclick="showPage('bonus')">🎁<span>Claim</span></button>
   <button onclick="showPage('about')">📖<span>About</span></button>
   <button onclick="showPage('settings')">💸<span>Earn</span></button>
+  <button onclick="showPage('refer')">🤝<span>Refer</span></button> <!-- 👈 Added Refer button -->
 </div>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- JavaScript Section (merged with your main logic) -->
 <script>
 let coins = 0;
 let tg = window.Telegram.WebApp;
@@ -299,7 +314,6 @@ document.getElementById("tap-button").addEventListener("mousedown", () => {
   coins++;
   updateDisplay();
 });
-
 document.getElementById("tap-button").addEventListener("touchstart", () => {
   coins++;
   updateDisplay();
@@ -413,6 +427,19 @@ if (telegramUser) {
   userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
   userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong><br>🆔 ID: ${telegramUser.id}<br>📛 Username: @${telegramUser.username || "none"}`;
   document.body.insertBefore(userInfo, document.body.firstChild);
+
+  // Setup referral link
+  const referralLink = `https://t.me/cryptocicsbot?start=${telegramUser.id}`;
+  const refInput = document.getElementById("refLink");
+  if (refInput) refInput.value = referralLink;
+}
+
+function copyRefLink() {
+  const linkInput = document.getElementById("refLink");
+  linkInput.select();
+  linkInput.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  document.getElementById("copyMsg").textContent = "✅ Link copied!";
 }
 
 // Load user balance at start
