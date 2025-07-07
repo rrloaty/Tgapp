@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DiceMint</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 60px;
+      overflow: hidden;
+    }
+    .top-bar {
+      width: 100%;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .top-bar span {
+      font-size: 1.2em;
+      background-color: #222;
+      padding: 8px 14px;
+      border-radius: 20px;
+    }
+    .page { display: none; padding: 20px; flex-grow: 1; overflow-y: auto; }
+    .page.active { display: block; }
+    h1 { text-align: center; margin-bottom: 15px; }
+    #coin-count {
+      text-align: center;
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
+    #tap-button {
+      display: block;
+      margin: 20px auto;
+      padding: 20px 40px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ffcc00;
+      color: #000;
+      cursor: pointer;
+      box-shadow: 0 5px #c9a000;
+    }
+    #tap-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px #c9a000;
+    }
+    #message {
+      text-align: center;
+      margin-top: 10px;
+      color: yellow;
+      font-size: 1.1em;
+    }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #111;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #333;
+    }
+    .bottom-nav button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .bottom-nav button span {
+      font-size: 0.75em;
+      margin-top: 4px;
+    }
+    .section-title {
+      font-size: 1.4em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    input, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #333;
+      color: #fff;
+      margin: 10px 0;
+      width: 100%;
+    }
+    button.bet-btn {
+      background: #00ff99;
+      color: #000;
+      padding: 10px;
+      border-radius: 8px;
+      width: 100%;
+      margin-top: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #dice {
+      display: block;
+      margin: 20px auto;
+      width: 100px;
+      height: 100px;
+      background: white;
+      border-radius: 15px;
+      transition: transform 0.5s ease;
+    }
+    .dot { fill: black; }
+    #bet-result {
+      margin-top: 15px;
+      background: #222;
+      padding: 10px;
+      border-left: 4px solid #00ff99;
+      border-radius: 6px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="top-bar">
+  <span>💰 $<span id="balance">0.00</span></span>
+</div>
+
+<!-- Home (Betting Game) -->
+<div id="home" class="page active">
+  <h1>🎲 DiceMint - Bet & Win</h1>
+  <input type="number" id="betAmount" placeholder="Enter bet amount ($)" min="0.01" step="0.01" />
+  <select id="guessNumber">
+    <option value="">Guess Dice (1–6)</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+  </select>
+  <button class="bet-btn" onclick="playBet()">Roll Dice & Bet</button>
+  <svg id="dice" viewBox="0 0 100 100"></svg>
+  <div id="bet-result"></div>
+</div>
+
+<!-- Withdraw Page -->
+<div id="withdraw" class="page">
+  <div class="section-title">💵 Withdraw</div>
+  <p style="text-align:center;">Withdraw if you have at least $250.00</p>
+<button 
+  id="withdrawBtn"
+  onclick="withdraw()"
+  style="
+    display: block;
+    margin: 20px auto;
+    width: 80%;
+    height: 60px;
+    background-color: #00ff99;
+    color: #000;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  "
+>
+  💵 Request Withdrawal
+</button>
+</div>
+
+<!-- Claim Bonus Page -->
+<div id="bonus" class="page">
+  <div class="section-title">🎁 Claim $10 Bonus</div>
+  <p style="text-align:center;">Join our Telegram group and channel to instantly receive $10 in your DiceMint wallet.</p>
+  <p style="text-align:center; margin-top: 10px;">
+    <a href="https://t.me/YourGroupLink" target="_blank" onclick="groupClicked = true; checkLinks()" style="color: #00ff99;">📢 Join Group</a><br/>
+    <a href="https://t.me/YourChannelLink" target="_blank" onclick="channelClicked = true; checkLinks()" style="color: #00ff99;">📣 Join Channel</a>
+  </p>
+  <button id="claim-btn" disabled style="display: block; margin: 20px auto; background: gray; color: #fff; padding: 10px; border: none; border-radius: 8px;">✅ I've Joined - Claim $10</button>
+  <div id="bonus-message" style="text-align:center; margin-top:10px;"></div>
+</div>
+
+<!-- About Page -->
+<div id="about" class="page">
+  <div class="section-title">📖 About DiceMint</div>
+  <p>
+    Welcome to <strong>DiceMint</strong> — your gateway to earning real money through fun and simple actions! 💸<br><br>
+
+    Here’s how you can start making money on DiceMint:
+
+    <strong>1. 🎲 Bet & Win with Dice:</strong><br>
+    - Enter an amount to bet (e.g., $0.50 or $1.00)<br>
+    - Choose a number between 1 to 6 that you think the dice will land on<br>
+    - Tap "Roll Dice & Bet"<br>
+    - If your guess is correct, you win double your bet! 🎉<br>
+    - If your guess is wrong, the bet is deducted from your balance<br>
+    - You need at least a small balance to start betting — if your balance is zero, you’ll be redirected to earn more first<br><br>
+
+    <strong>2. 💸 Tap & Earn:</strong><br>
+    - Simply tap the "Tap to Earn" button to collect coins<br>
+    - Each tap earns you 1 coin = $0.01<br>
+    - No limits — tap as much as you like to grow your balance<br><br>
+
+    <strong>3. 🎁 Claim Free $10 Bonus:</strong><br>
+    - Join our official Telegram group and channel<br>
+    - Once you click both links, the “Claim Bonus” button becomes active<br>
+    - Tap the button to instantly receive $10 into your DiceMint wallet<br>
+    - One-time bonus per user (tracked in your browser)<br><br>
+
+    <strong>4. 💵 Withdraw Your Earnings:</strong><br>
+    - You can request withdrawal once your balance reaches at least <strong>$250</strong><br>
+    - Just go to the Withdraw section and tap “Withdraw Now”<br>
+    - Your withdrawal request will be sent directly to our Telegram system for processing<br><br>
+
+    <strong>5. 🔐 Your Balance Is Safe:</strong><br>
+    - Your balance is stored in your browser using local storage<br>
+    - Make sure you don’t clear your browser data or use Incognito mode to avoid losing progress<br><br>
+
+    <strong>More Features Coming Soon:</strong><br>
+    - Referral rewards<br>
+    - Spin & Win mini-game<br>
+    - Login & Leaderboard<br><br>
+
+    Join thousands of players earning daily on DiceMint. Play responsibly, tap smartly, and grow your balance to cash out! 🚀
+  </p>
+</div>
+</div>
+
+<!-- Tap & Earn Page -->
+<div id="settings" class="page">
+  <div class="section-title">💸 Tap & Earn</div>
+  <div id="coin-count">Coins: 0</div>
+  <button id="tap-button">Tap to Earn</button>
+  <div id="message"></div>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+  <button onclick="showPage('home')">🎲<span>Bet</span></button>
+  <button onclick="showPage('withdraw')">💵<span>Withdraw</span></button>
+  <button onclick="showPage('bonus')">🎁<span>Claim</span></button>
+  <button onclick="showPage('about')">📖<span>About</span></button>
+  <button onclick="showPage('settings')">💸<span>Earn</span></button>
+</div>
+
+<script>
+  let coins = parseInt(localStorage.getItem("dicemint_coins")) || 0;
+  const TELEGRAM_BOT_TOKEN = "7782600997:AAHkI0CBrgQqeFdykaI7qFWMEECYImmd00M";
+  const TELEGRAM_CHAT_ID = "6940101627";
+
+  const coinDisplay = document.getElementById("coin-count");
+  const balanceDisplay = document.getElementById("balance");
+  const message = document.getElementById("message");
+
+  function updateDisplay() {
+    coinDisplay.textContent = `Coins: ${coins}`;
+    balanceDisplay.textContent = (coins * 0.01).toFixed(2);
+    localStorage.setItem("dicemint_coins", coins);
+  }
+
+  document.getElementById("tap-button").addEventListener("mousedown", () => {
+    coins++;
+    updateDisplay();
+  });
+
+  document.getElementById("tap-button").addEventListener("touchstart", () => {
+    coins++;
+    updateDisplay();
+  });
+
+  function withdraw() {
+    const balance = coins * 0.01;
+    if (balance >= 250) {
+      const text = `🤑 Withdrawal Request\nCoins: ${coins}\nAmount: $${balance.toFixed(2)}\nFrom DiceMint`;
+      const url = `https://cors-anywhere.herokuapp.com/https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok) {
+          message.textContent = `✅ Withdrawal of $${balance.toFixed(2)} sent to Telegram!`;
+          coins = 0;
+          updateDisplay();
+        } else {
+          message.textContent = "❌ Telegram error.";
+        }
+      })
+      .catch(() => {
+        message.textContent = "⚠️ Network or CORS error!";
+      });
+    } else {
+      message.textContent = "❌ You need at least $250 to withdraw.";
+    }
+  }
+
+  function showPage(id) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  const dice = document.getElementById("dice");
+  const betResult = document.getElementById("bet-result");
+
+  function drawDots(number) {
+    const positions = {
+      1: [[50, 50]],
+      2: [[25, 25], [75, 75]],
+      3: [[25, 25], [50, 50], [75, 75]],
+      4: [[25, 25], [75, 25], [25, 75], [75, 75]],
+      5: [[25, 25], [75, 25], [50, 50], [25, 75], [75, 75]],
+      6: [[25, 25], [75, 25], [25, 50], [75, 50], [25, 75], [75, 75]]
+    };
+    dice.innerHTML = "";
+    positions[number].forEach(([cx, cy]) => {
+      const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      dot.setAttribute("cx", cx);
+      dot.setAttribute("cy", cy);
+      dot.setAttribute("r", 8);
+      dot.setAttribute("class", "dot");
+      dice.appendChild(dot);
+    });
+  }
+  drawDots(1);
+
+  function playBet() {
+    const bet = parseFloat(document.getElementById("betAmount").value);
+    const guess = parseInt(document.getElementById("guessNumber").value);
+    const balance = coins * 0.01;
+    if (balance <= 0) {
+      alert("You don't have enough to bet. Please tap to earn first!");
+      showPage("settings");
+      return;
+    }
+    if (isNaN(bet) || bet <= 0 || bet > balance) {
+      betResult.textContent = "❌ Invalid bet amount.";
+      return;
+    }
+    if (isNaN(guess) || guess < 1 || guess > 6) {
+      betResult.textContent = "❌ Please guess a number between 1 and 6.";
+      return;
+    }
+    dice.style.transform = "rotate(720deg)";
+    betResult.textContent = "Rolling...";
+    setTimeout(() => {
+      const rolled = Math.floor(Math.random() * 6) + 1;
+      drawDots(rolled);
+      dice.style.transform = "rotate(0deg)";
+      if (guess === rolled) {
+        coins += Math.floor(bet * 100);
+        betResult.textContent = `✅ You WON! Dice: ${rolled}`;
+      } else {
+        coins -= Math.floor(bet * 100);
+        betResult.textContent = `❌ You lost! Dice: ${rolled}`;
+      }
+      updateDisplay();
+    }, 800);
+  }
+
+  let groupClicked = false;
+  let channelClicked = false;
+
+  function checkLinks() {
+    if (groupClicked && channelClicked) {
+      const btn = document.getElementById("claim-btn");
+      btn.disabled = false;
+      btn.style.background = "#00ff99";
+      btn.style.color = "#000";
+      btn.onclick = claimBonus;
+    }
+  }
+
+  function claimBonus() {
+    if (localStorage.getItem("bonus_claimed")) {
+      document.getElementById("bonus-message").textContent = "❌ You already claimed this bonus.";
+      return;
+    }
+    coins += 1000;
+    updateDisplay();
+    localStorage.setItem("bonus_claimed", true);
+    document.getElementById("bonus-message").textContent = "✅ $10 bonus added to your wallet!";
+  }
+
+  updateDisplay();
+</script>
+</body>
+</html>
