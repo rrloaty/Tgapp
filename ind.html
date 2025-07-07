@@ -268,21 +268,18 @@
 <!-- JavaScript Section (merged with your main logic) -->
 <script>
 let coins = 0;
-let syncTimer;
-let syncing = false;
-
 let tg = window.Telegram.WebApp;
 tg.expand();
 
 const telegramUser = tg.initDataUnsafe?.user;
 const telegramId = telegramUser?.id || null;
-const backendURL = "https://earnbottech.pythonanywhere.com";
+const backendURL = "https://dicemint-backend.onrender.com";
 
 const coinDisplay = document.getElementById("coin-count");
 const balanceDisplay = document.getElementById("balance");
 const message = document.getElementById("message");
 
-// Fetch balance from backend
+// Get balance from backend
 function fetchBalance() {
   if (!telegramId) return;
   fetch(`${backendURL}/get_balance`, {
@@ -293,34 +290,26 @@ function fetchBalance() {
     .then(res => res.json())
     .then(data => {
       coins = data.balance || 0;
-      updateDisplay(false); // Don't trigger sync again immediately
+      updateDisplay();
     });
 }
 
-// Sync balance to backend with debounce
+// Update balance on backend
 function syncBalance() {
-  if (!telegramId || syncing) return;
-  syncing = true;
+  if (!telegramId) return;
   fetch(`${backendURL}/update_balance`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ telegram_id: telegramId, balance: coins })
-  }).finally(() => {
-    syncing = false;
   });
 }
 
-// Update coin UI and optionally sync
-function updateDisplay(triggerSync = true) {
+function updateDisplay() {
   coinDisplay.textContent = `Coins: ${coins}`;
   balanceDisplay.textContent = (coins * 0.01).toFixed(2);
-  if (triggerSync) {
-    if (syncTimer) clearTimeout(syncTimer);
-    syncTimer = setTimeout(() => syncBalance(), 1000);
-  }
+  syncBalance();
 }
 
-// Handle Tap & Earn
 document.getElementById("tap-button").addEventListener("mousedown", () => {
   coins++;
   updateDisplay();
@@ -330,7 +319,7 @@ document.getElementById("tap-button").addEventListener("touchstart", () => {
   updateDisplay();
 });
 
-// Withdraw
+// Withdraw function
 function withdraw() {
   const balance = coins * 0.01;
   if (balance >= 250) {
@@ -342,7 +331,7 @@ function withdraw() {
   }
 }
 
-// Dice roll logic
+// Dice roll game
 const dice = document.getElementById("dice");
 const betResult = document.getElementById("bet-result");
 
@@ -367,12 +356,10 @@ function drawDots(number) {
 }
 drawDots(1);
 
-// Betting logic
 function playBet() {
   const bet = parseFloat(document.getElementById("betAmount").value);
   const guess = parseInt(document.getElementById("guessNumber").value);
   const balance = coins * 0.01;
-
   if (balance <= 0) {
     alert("You don't have enough to bet. Please tap to earn first!");
     showPage("settings");
@@ -405,13 +392,11 @@ function playBet() {
   }, 800);
 }
 
-// Page switching
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-// Bonus claiming
 let groupClicked = false;
 let channelClicked = false;
 
@@ -436,13 +421,14 @@ function claimBonus() {
   document.getElementById("bonus-message").textContent = "✅ $10 bonus added to your wallet!";
 }
 
-// Telegram user info
+// Show Telegram user info
 if (telegramUser) {
   const userInfo = document.createElement("div");
   userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
   userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong><br>🆔 ID: ${telegramUser.id}<br>📛 Username: @${telegramUser.username || "none"}`;
   document.body.insertBefore(userInfo, document.body.firstChild);
 
+  // Setup referral link
   const referralLink = `https://t.me/cryptocicsbot?start=${telegramUser.id}`;
   const refInput = document.getElementById("refLink");
   if (refInput) refInput.value = referralLink;
@@ -456,7 +442,7 @@ function copyRefLink() {
   document.getElementById("copyMsg").textContent = "✅ Link copied!";
 }
 
-// Load balance when page starts
+// Load user balance at start
 fetchBalance();
 </script>
 </body>
