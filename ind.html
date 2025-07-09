@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DiceMint</title>
   <style>
-    /* 🎨 All your CSS remains here (unchanged) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -126,27 +125,26 @@
       text-align: center;
     }
     #deposit-icon {
-  font-size: 1.5em;
-  text-decoration: none;
-  margin-right: auto;
-  margin-left: 10px;
-  background: #00ff99;
-  padding: 6px 12px;
-  border-radius: 20px;
-  color: #000;
-  font-weight: bold;
-}
+      font-size: 1.5em;
+      text-decoration: none;
+      margin-right: auto;
+      margin-left: 10px;
+      background: #00ff99;
+      padding: 6px 12px;
+      border-radius: 20px;
+      color: #000;
+      font-weight: bold;
+    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
- <div class="top-bar">
-<a href="deposit.html" id="deposit-icon" title="Deposit"><p>Add coins ➕</p></a>
-  <span>💰 $<span id="balance">0.00</span></span>
-</div>
+  <div class="top-bar">
+    <a href="deposit.html" id="deposit-icon" title="Deposit"><p>Add coins ➕</p></a>
+    <span>💰 $<span id="balance">0.00</span></span>
+  </div>
 
-  <!-- Pages (Home, draw, Bonus, About, Tap & Earn, Refer) -->
-  <div id="home" class="page active"> <!-- Betting Game -->
+  <div id="home" class="page active">
     <h1>🎲 DiceMint - Bet & Win</h1>
     <input type="number" id="betAmount" placeholder="Enter bet amount ($)" min="0.01" step="0.01" />
     <select id="guessNumber">
@@ -159,15 +157,9 @@
     <div id="bet-result"></div>
   </div>
 
-  <div id="draw" class="page">
-    <div class="section-title">💵 draw</div>
-    <p style="text-align:center;">draw if you have at least $250.00</p>
-    <button id="drawBtn" onclick="draw()" style="display: block; margin: 20px auto; width: 80%; height: 60px; background-color: #00ff99; color: #000; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">💵 Request drawal</button>
-  </div>
-
   <div id="bonus" class="page">
     <div class="section-title">🎁 Claim $10 Bonus</div>
-    <p style="text-align:center;">Join our Telegram group and channel to instantly receive $10 in your DiceMint wallet.</p>
+    <p style="text-align:center;">Join our Telegram group and channel to receive $10 in your DiceMint wallet.</p>
     <p style="text-align:center; margin-top: 10px;">
       <a href="https://t.me/cryptoprojectggl/150" target="_blank" onclick="groupClicked = true; checkLinks()" style="color: #00ff99;">📢 Join Group</a><br/>
       <a href="https://t.me/vercrypaders/33" target="_blank" onclick="channelClicked = true; checkLinks()" style="color: #00ff99;">📣 Join Channel</a>
@@ -176,49 +168,6 @@
     <div id="bonus-message" style="text-align:center; margin-top:10px;"></div>
   </div>
 
-  <div id="about" class="page">
-  <div class="section-title">📖 About DiceMint</div>
-  <p>
-    Welcome to <strong>DiceMint</strong> — your gateway to earning real money through fun and simple actions! 💸<br><br>
-
-    Here’s how you can start making money on DiceMint:
-
-    <strong>1. 🎲 Bet & Win  Dice:</strong><br>
-    - Enter an amount to bet (e.g., $0.50 or $1.00)<br>
-    - Choose a number between 1 to 6 that you think the dice will land on<br>
-    - Tap "Roll Dice & Bet"<br>
-    - If your guess is correct, you win double your bet! 🎉<br>
-    - If your guess is wrong, the bet is deducted from your balance<br>
-    - You need at least a small balance to start betting — if your balance is zero, you’ll be redirected to earn more first<br><br>
-
-    <strong>2. 💸 Tap & Earn:</strong><br>
-    - Simply tap the "Tap to Earn" button to collect coins<br>
-    - Each tap earns you 1 coin = $0.01<br>
-    - No limits — tap as much as you like to grow your balance<br><br>
-
-    <strong>3. 🎁 Claim Free $10 Bonus:</strong><br>
-    - Join our official Telegram group and channel<br>
-    - Once you click both links, the “Claim Bonus” button becomes active<br>
-    - Tap the button to instantly receive $10 into your DiceMint wallet<br>
-    - One-time bonus per user (tracked in your browser)<br><br>
-
-    <strong>4. 💵 draw Your Earnings:</strong><br>
-    - You can request drawal once your balance reaches at least <strong>$250</strong><br>
-    - Just go to the draw section and tap “draw Now”<br>
-    - Your drawal request will be sent directly to our Telegram system for processing<br><br>
-
-    <strong>5. 🔐 Your Balance Is Safe:</strong><br>
-    - Your balance is stored in your browser using local storage<br>
-    - Make sure you don’t clear your browser data or use Incognito mode to avoid losing progress<br><br>
-
-    <strong>More Features Coming Soon:</strong><br>
-    - Referral rewards<br>
-    - Spin & Win mini-game<br>
-    - Login & Leaderboard<br><br>
-
-    Join thousands of players earning daily on DiceMint. Play responsibly, tap smartly, and grow your balance to cash out! 🚀
-  </p>
-</div>
   <div id="settings" class="page">
     <div class="section-title">💸 Tap & Earn</div>
     <div id="coin-count">Coins: 0</div>
@@ -236,21 +185,23 @@
     <p id="copyMsg" style="text-align:center; font-size: 0.9em;"></p>
   </div>
 
-  <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <button onclick="showPage('home')">🎲<span>Bet</span></button>
-<a href="withdraw.html" style="text-decoration: none;">
-  <div style="color: white; font-size: 1.2em; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
-    💵<span style="font-size: 0.75em; margin-top: 4px;">withdraw</span>
-  </div>
-</a>
+    <a href="withdraw.html" style="text-decoration: none;">
+      <button style="background: none; border: none; color: white; font-size: 1.2em; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        💵<span style="font-size: 0.75em; margin-top: 4px;">Withdraw</span>
+      </button>
+    </a>
     <button onclick="showPage('bonus')">🎁<span>Claim</span></button>
-    <button onclick="showPage('about')">📖<span>About</span></button>
+    <a href="about.html" style="text-decoration: none;">
+      <button style="background: none; border: none; color: white; font-size: 1.2em; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        📖<span style="font-size: 0.75em; margin-top: 4px;">About</span>
+      </button>
+    </a>
     <button onclick="showPage('settings')">💸<span>Earn</span></button>
     <button onclick="showPage('refer')">🤝<span>Refer</span></button>
   </div>
 
-  <!-- External JS File -->
   <script src="index.js"></script>
 </body>
 </html>
