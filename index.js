@@ -10,24 +10,6 @@ const coinDisplay = document.getElementById("coin-count");
 const balanceDisplay = document.getElementById("balance");
 const message = document.getElementById("message");
 
-// 👉 REFERRAL HANDLING
-const urlParams = new URLSearchParams(window.location.search);
-const referrerId = urlParams.get("start");
-
-if (referrerId && telegramId && telegramId != referrerId) {
-  fetch(`${backendURL}/api/referral`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      new_user_id: telegramId,
-      referrer_id: referrerId
-    })
-  })
-    .then(res => res.json())
-    .then(data => console.log("Referral result:", data))
-    .catch(err => console.error("Referral error:", err));
-}
-
 // Get balance from backend
 function fetchBalance() {
   if (!telegramId) return;
@@ -53,22 +35,25 @@ function syncBalance() {
   });
 }
 
-// Update coin and dollar displays
+// Update UI
 function updateDisplay() {
-  coinDisplay.textContent = `Coins: ${coins}`;
-  balanceDisplay.textContent = (coins * 0.01).toFixed(2);
+  if (coinDisplay) coinDisplay.textContent = `Coins: ${coins}`;
+  if (balanceDisplay) balanceDisplay.textContent = (coins * 0.01).toFixed(2);
   syncBalance();
 }
 
 // Tap to earn
-document.getElementById("tap-button").addEventListener("mousedown", () => {
-  coins++;
-  updateDisplay();
-});
-document.getElementById("tap-button").addEventListener("touchstart", () => {
-  coins++;
-  updateDisplay();
-});
+const tapBtn = document.getElementById("tap-button");
+if (tapBtn) {
+  tapBtn.addEventListener("mousedown", () => {
+    coins++;
+    updateDisplay();
+  });
+  tapBtn.addEventListener("touchstart", () => {
+    coins++;
+    updateDisplay();
+  });
+}
 
 // Withdraw
 function withdraw() {
@@ -82,7 +67,7 @@ function withdraw() {
   }
 }
 
-// Dice bet logic
+// Dice game
 const dice = document.getElementById("dice");
 const betResult = document.getElementById("bet-result");
 
@@ -144,13 +129,13 @@ function playBet() {
   }, 800);
 }
 
-// Show page navigation
+// Page switcher
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-// Bonus claiming logic
+// Bonus
 let groupClicked = false;
 let channelClicked = false;
 
@@ -165,25 +150,32 @@ function checkLinks() {
 }
 
 function claimBonus() {
-  if (localStorage.getItem("bonus_claimed")) {
-    document.getElementById("bonus-message").textContent = "❌ You already claimed this bonus.";
-    return;
-  }
-  coins += 1000;
-  updateDisplay();
-  localStorage.setItem("bonus_claimed", true);
-  document.getElementById("bonus-message").textContent = "✅ $10 bonus added to your wallet!";
+  if (!telegramId) return;
+  fetch(`${backendURL}/claim_bonus`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ telegram_id: telegramId })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        coins += 1000;
+        updateDisplay();
+        document.getElementById("bonus-message").textContent = "✅ $10 bonus added!";
+      } else {
+        document.getElementById("bonus-message").textContent = "❌ You already claimed this bonus.";
+      }
+    });
 }
 
-// Show Telegram user info
+// Referral
 if (telegramUser) {
   const userInfo = document.createElement("div");
   userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
   userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong><br>🆔 ID: ${telegramUser.id}<br>📛 Username: @${telegramUser.username || "none"}`;
   document.body.insertBefore(userInfo, document.body.firstChild);
 
-  // Referral link
-  const referralLink = `https://t.me/dicemintmonibot/dicemintgameapp?start=${telegramUser.id}`;
+  const referralLink = `https://t.me/cryptocicsbot?start=${telegramUser.id}`;
   const refInput = document.getElementById("refLink");
   if (refInput) refInput.value = referralLink;
 }
@@ -196,5 +188,5 @@ function copyRefLink() {
   document.getElementById("copyMsg").textContent = "✅ Link copied!";
 }
 
-// Start
-fetchBalance(); b
+// Load balance on start
+fetchBalance();
