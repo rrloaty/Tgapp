@@ -14,85 +14,156 @@
       text-align: center;
       position: relative;
     }
+
     .top-back {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 1.5em;
+      top: 15px;
+      left: 15px;
+      font-size: 1em;
       background: #00ff99;
       color: #000;
-      padding: 8px 15px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: 6px;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 500;
     }
+
     h1 {
-      margin-top: 60px;
-      font-size: 2em;
+      margin-top: 50px;
+      font-size: 1.6em;
     }
+
     p {
-      margin: 20px 0;
-      font-size: 1.1em;
+      margin: 15px 0;
+      font-size: 1em;
     }
+
     .wallet {
       background: #1a1a1a;
-      padding: 15px;
-      margin: 20px auto;
-      max-width: 360px;
-      border-radius: 10px;
+      padding: 12px;
+      margin: 15px auto 8px;
+      max-width: 350px;
+      border-radius: 8px;
       word-break: break-word;
-      font-size: 1em;
+      font-size: 0.95em;
       border: 1px solid #00ff99;
     }
-    .qr-code {
-      margin: 20px auto;
+
+    .copy-btn {
+      margin-bottom: 20px;
+      background: #00ff99;
+      color: #000;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 0.9em;
+      cursor: pointer;
+      font-weight: 500;
     }
+
+    .copy-btn:hover {
+      background: #00dd88;
+    }
+
     .bot-link,
     .back-link {
       display: inline-block;
-      margin: 15px 10px;
-      padding: 12px 25px;
-      font-size: 1.05em;
+      margin: 10px 6px;
+      padding: 8px 18px;
+      font-size: 0.95em;
       background: #00ff99;
       color: #000;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 6px;
+      font-weight: 500;
     }
+
     .bot-link:hover,
     .back-link:hover,
     .top-back:hover {
       background: #00dd88;
     }
+
     small {
-      font-size: 0.85em;
+      font-size: 0.8em;
       color: #ccc;
+    }
+
+    ul.token-list {
+      text-align: left;
+      max-width: 380px;
+      margin: 10px auto;
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #00ff99;
+      font-size: 0.95em;
+    }
+
+    ul.token-list li {
+      margin-bottom: 6px;
+    }
+
+    .warning {
+      color: #ffcc00;
+      background: rgba(255, 204, 0, 0.1);
+      border-left: 4px solid #ffcc00;
+      padding: 10px;
+      margin-top: 12px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+      font-weight: 500;
+      border-radius: 6px;
+      font-size: 0.95em;
     }
   </style>
 </head>
 <body>
   <!-- 🔙 Top-Left Back Button -->
-  <a href="ind.html" class="top-back">←</a>
+  <a href="ind.html" class="top-back">← Back</a>
 
   <h1>💰 Deposit to DiceMint</h1>
-  <p>Send BNB (Smart Chain - BEP-20) to the address below:</p>
-  
-  <div class="wallet">
+
+  <p>You can send any of the following <strong>BEP-20 tokens</strong> to the address below:</p>
+
+  <ul class="token-list">
+    <li>✅ BNB (Smart Chain)</li>
+    <li>✅ USDT (BEP-20)</li>
+    <li>✅ BUSD (BEP-20)</li>
+    <li>✅ CAKE (PancakeSwap)</li>
+    <li>✅ WBNB</li>
+    <li>✅ Any other BEP-20 token</li>
+  </ul>
+
+  <div class="warning">
+    ⚠️ Only use the <strong>BNB Smart Chain (BEP-20)</strong> network.<br>
+    Do NOT send from Ethereum (ERC-20), TRON (TRC-20), or BEP-2. Wrong network = lost funds!
+  </div>
+
+  <div class="wallet" id="walletAddress">
     0xa84bd2cfbBad66Ae2c5daf9aCe764dc845b94C7C
   </div>
+  <button class="copy-btn" onclick="copyWallet()">📋 Copy Address</button>
 
-  <div class="qr-code">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?data=0xa84bd2cfbBad66Ae2c5daf9aCe764dc845b94C7C&size=200x200" alt="BNB QR Code" />
-  </div>
-
-  <p>After sending, click the button below to confirm your deposit with proof.</p>
+  <p>After sending, click the button below to confirm your deposit with proof:</p>
 
   <a href="https://t.me/dicemintmonibot" class="bot-link">🚀 Open Deposit Bot</a>
   <a href="ind.html" class="back-link">🔙 Back</a>
 
-  <p style="margin-top: 30px;">
-    <small>⚠️ Only send BNB via BNB Smart Chain (BEP-20). Minimum deposit: $1.<br>
-    Use your main Telegram account to continue.</small>
+  <p style="margin-top: 25px;">
+    <small>⚠️ Minimum deposit: $1. Use your main Telegram account.</small>
   </p>
+
+  <script>
+    function copyWallet() {
+      const address = document.getElementById('walletAddress').innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        alert("✅ Wallet address copied!");
+      }).catch(() => {
+        alert("❌ Failed to copy address. Please try manually.");
+      });
+    }
+  </script>
 </body>
 </html>
