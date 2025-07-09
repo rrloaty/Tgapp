@@ -35,7 +35,7 @@ function syncBalance() {
   });
 }
 
-// Update UI
+// Update UI display
 function updateDisplay() {
   if (coinDisplay) coinDisplay.textContent = `Coins: ${coins}`;
   if (balanceDisplay) balanceDisplay.textContent = (coins * 0.01).toFixed(2);
@@ -67,7 +67,7 @@ function withdraw() {
   }
 }
 
-// Dice game
+// Dice bet
 const dice = document.getElementById("dice");
 const betResult = document.getElementById("bet-result");
 
@@ -129,13 +129,13 @@ function playBet() {
   }, 800);
 }
 
-// Page switcher
+// Navigation
 function showPage(id) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-// Bonus
+// Bonus claiming
 let groupClicked = false;
 let channelClicked = false;
 
@@ -163,19 +163,19 @@ function claimBonus() {
         updateDisplay();
         document.getElementById("bonus-message").textContent = "✅ $10 bonus added!";
       } else {
-        document.getElementById("bonus-message").textContent = "❌ You already claimed this bonus.";
+        document.getElementById("bonus-message").textContent = "❌ Bonus already claimed.";
       }
     });
 }
 
-// Referral
+// Telegram user & referral
 if (telegramUser) {
   const userInfo = document.createElement("div");
   userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
   userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong><br>🆔 ID: ${telegramUser.id}<br>📛 Username: @${telegramUser.username || "none"}`;
   document.body.insertBefore(userInfo, document.body.firstChild);
 
-  const referralLink = `https://t.me/cryptocicsbot?start=${telegramUser.id}`;
+  const referralLink = `https://t.me/dicemintmonibot/dicemintgameapp?start=${telegramUser.id}`;
   const refInput = document.getElementById("refLink");
   if (refInput) refInput.value = referralLink;
 }
@@ -188,5 +188,5 @@ function copyRefLink() {
   document.getElementById("copyMsg").textContent = "✅ Link copied!";
 }
 
-// Load balance on start
+// Init
 fetchBalance();
