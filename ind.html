@@ -145,7 +145,7 @@
   <span>💰 $<span id="balance">0.00</span></span>
 </div>
 
-  <!-- Pages (Home, Withdraw, Bonus, About, Tap & Earn, Refer) -->
+  <!-- Pages (Home, draw, Bonus, About, Tap & Earn, Refer) -->
   <div id="home" class="page active"> <!-- Betting Game -->
     <h1>🎲 DiceMint - Bet & Win</h1>
     <input type="number" id="betAmount" placeholder="Enter bet amount ($)" min="0.01" step="0.01" />
@@ -159,10 +159,10 @@
     <div id="bet-result"></div>
   </div>
 
-  <div id="withdraw" class="page">
-    <div class="section-title">💵 Withdraw</div>
-    <p style="text-align:center;">Withdraw if you have at least $250.00</p>
-    <button id="withdrawBtn" onclick="withdraw()" style="display: block; margin: 20px auto; width: 80%; height: 60px; background-color: #00ff99; color: #000; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">💵 Request Withdrawal</button>
+  <div id="draw" class="page">
+    <div class="section-title">💵 draw</div>
+    <p style="text-align:center;">draw if you have at least $250.00</p>
+    <button id="drawBtn" onclick="draw()" style="display: block; margin: 20px auto; width: 80%; height: 60px; background-color: #00ff99; color: #000; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer;">💵 Request drawal</button>
   </div>
 
   <div id="bonus" class="page">
@@ -183,7 +183,7 @@
 
     Here’s how you can start making money on DiceMint:
 
-    <strong>1. 🎲 Bet & Win with Dice:</strong><br>
+    <strong>1. 🎲 Bet & Win  Dice:</strong><br>
     - Enter an amount to bet (e.g., $0.50 or $1.00)<br>
     - Choose a number between 1 to 6 that you think the dice will land on<br>
     - Tap "Roll Dice & Bet"<br>
@@ -202,10 +202,10 @@
     - Tap the button to instantly receive $10 into your DiceMint wallet<br>
     - One-time bonus per user (tracked in your browser)<br><br>
 
-    <strong>4. 💵 Withdraw Your Earnings:</strong><br>
-    - You can request withdrawal once your balance reaches at least <strong>$250</strong><br>
-    - Just go to the Withdraw section and tap “Withdraw Now”<br>
-    - Your withdrawal request will be sent directly to our Telegram system for processing<br><br>
+    <strong>4. 💵 draw Your Earnings:</strong><br>
+    - You can request drawal once your balance reaches at least <strong>$250</strong><br>
+    - Just go to the draw section and tap “draw Now”<br>
+    - Your drawal request will be sent directly to our Telegram system for processing<br><br>
 
     <strong>5. 🔐 Your Balance Is Safe:</strong><br>
     - Your balance is stored in your browser using local storage<br>
@@ -239,7 +239,11 @@
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
     <button onclick="showPage('home')">🎲<span>Bet</span></button>
-    <button onclick="showPage('withdraw')">💵<span>Withdraw</span></button>
+<a href="withdraw.html" style="text-decoration: none;">
+  <div style="color: white; font-size: 1.2em; display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+    💵<span style="font-size: 0.75em; margin-top: 4px;">withdraw</span>
+  </div>
+</a>
     <button onclick="showPage('bonus')">🎁<span>Claim</span></button>
     <button onclick="showPage('about')">📖<span>About</span></button>
     <button onclick="showPage('settings')">💸<span>Earn</span></button>
