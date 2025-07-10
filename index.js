@@ -4,13 +4,13 @@ tg.expand();
 
 const telegramUser = tg.initDataUnsafe?.user;
 const telegramId = telegramUser?.id || null;
-const backendURL = "https://dicemint-backend.onrender.com";
+const backendURL = "https://backend-dicemint-2vzu.onrender.com";
 
 const coinDisplay = document.getElementById("coin-count");
 const balanceDisplay = document.getElementById("balance");
 const message = document.getElementById("message");
 
-// Get balance from backend
+// Fetch balance from backend
 function fetchBalance() {
   if (!telegramId) return;
   fetch(`${backendURL}/get_balance`, {
@@ -25,7 +25,7 @@ function fetchBalance() {
     });
 }
 
-// Update balance on backend
+// Sync balance to backend
 function syncBalance() {
   if (!telegramId) return;
   fetch(`${backendURL}/update_balance`, {
@@ -35,7 +35,7 @@ function syncBalance() {
   });
 }
 
-// Update UI display
+// Update UI
 function updateDisplay() {
   if (coinDisplay) coinDisplay.textContent = `Coins: ${coins}`;
   if (balanceDisplay) balanceDisplay.textContent = (coins * 0.01).toFixed(2);
@@ -67,7 +67,7 @@ function withdraw() {
   }
 }
 
-// Dice bet
+// Dice betting logic
 const dice = document.getElementById("dice");
 const betResult = document.getElementById("bet-result");
 
@@ -107,7 +107,7 @@ function playBet() {
     return;
   }
   if (isNaN(guess) || guess < 1 || guess > 6) {
-    betResult.textContent = "❌ Please guess a number between 1 and 6.";
+    betResult.textContent = "❌ Guess a number between 1 and 6.";
     return;
   }
 
@@ -135,7 +135,7 @@ function showPage(id) {
   document.getElementById(id).classList.add("active");
 }
 
-// Bonus claiming
+// Claim Bonus
 let groupClicked = false;
 let channelClicked = false;
 
@@ -168,7 +168,7 @@ function claimBonus() {
     });
 }
 
-// Telegram user & referral
+// Telegram Info + Referral
 if (telegramUser) {
   const userInfo = document.createElement("div");
   userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
