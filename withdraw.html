@@ -67,8 +67,8 @@
 </head>
 <body>
   <div style="margin-bottom: 15px;">
-  <a href="ind.html" style="color: #00ff99; text-decoration: none; font-size: 1.1em;">← Back to Dashboard</a>
-</div>
+    <a href="ind.html" style="color: #00ff99; text-decoration: none; font-size: 1.1em;">← Back to Dashboard</a>
+  </div>
   <h1>💵 Withdraw Funds</h1>
   <div class="balance-box">
     Available Balance: $<span id="balance">0.00</span>
@@ -85,15 +85,17 @@
     🚫 If we detect any unusual activity (such as using a bot to auto-tap), your withdrawal will be rejected <strong>without any response</strong> or refund.<br><br>
     🚨 Please play fairly to avoid disqualification.
   </div>
-<div style="text-align: center; margin-top: 30px;">
-  <a href="ind.html" style="color: #00ff99; text-decoration: none; font-size: 1.1em;">← Back to Dashboard</a>
-</div>
+
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="ind.html" style="color: #00ff99; text-decoration: none; font-size: 1.1em;">← Back to Dashboard</a>
+  </div>
+
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
     const telegramId = tg.initDataUnsafe?.user?.id || null;
-    const backendURL = "https://dicemint-backend.onrender.com";
+    const backendURL = "https://backend-dicemint-2vzu.onrender.com";
 
     let coins = 0;
 
