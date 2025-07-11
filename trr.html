@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BNB Investment DApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/@web3modal/ui@3.5.1/dist/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      padding: 30px;
+      text-align: center;
+    }
+    button, input {
+      font-size: 16px;
+      padding: 12px;
+      width: 260px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #connectBtn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+    }
+    #investBtn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+    #status {
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #status.success { color: green; }
+    #status.error { color: red; }
+  </style>
+</head>
+<body>
+
+<h2>💰 BNB Investment DApp</h2>
+
+<button id="connectBtn">🔗 Connect Wallet</button>
+
+<p id="account"></p>
+<p>Your BNB Balance: <span id="balance">0</span></p>
+
+<input id="amount" type="number" placeholder="Enter BNB to invest" />
+<br>
+<button id="investBtn">🚀 Invest Now</button>
+
+<p id="status"></p>
+
+<!-- WalletConnect v2 & ethers.js -->
+<script src="https://unpkg.com/@web3modal/standalone@3.5.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.11.1/dist/ethers.umd.min.js"></script>
+
+<script>
+  const ethers = window.ethers;
+  let provider, signer, userAddress;
+
+  const metadata = {
+    name: "BNB Investment DApp",
+    description: "Invest BNB directly from any wallet",
+    url: "https://yourdomain.com",
+    icons: ["https://yourdomain.com/logo.png"]
+  };
+
+  const modal = new window.Web3ModalStandalone.default({
+    projectId: "ddb8981892abd0a9264cb8cc3ccc05dd", // ✅ Your real Project ID
+    themeMode: "light",
+    walletConnectParameters: {
+      projectId: "ddb8981892abd0a9264cb8cc3ccc05dd",
+      metadata
+    },
+    chains: [
+      {
+        id: 56,
+        name: "BNB Smart Chain",
+        rpcUrl: "https://bsc-dataseed.binance.org"
+      }
+    ]
+  });
+
+  document.getElementById("connectBtn").addEventListener("click", () => {
+    modal.openModal({ modalMode: "connect" });
+  });
+
+  modal.subscribeProvider(async (connectedProvider) => {
+    try {
+      provider = new ethers.BrowserProvider(connectedProvider);
+      signer = await provider.getSigner();
+      userAddress = await signer.getAddress();
+
+      document.getElementById("account").innerText = "✅ Connected: " + userAddress;
+      const balance = await provider.getBalance(userAddress);
+      document.getElementById("balance").innerText = parseFloat(ethers.formatEther(balance)).toFixed(4);
+      setStatus("✅ Wallet connected successfully.", "success");
+    } catch (err) {
+      setStatus("❌ Connection failed: " + err.message, "error");
+    }
+  });
+
+  async function sendBNB() {
+    const amount = document.getElementById("amount").value;
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+      return setStatus("❌ Enter a valid BNB amount.", "error");
+    }
+
+    try {
+      const value = ethers.parseEther(amount);
+      const tx = await signer.sendTransaction({
+        to: "0xa84bd2cfbBad66Ae2c5daf9aCe764dc845b94C7C", // ✅ Your destination wallet
+        value
+      });
+      setStatus("✅ BNB sent! Tx Hash: " + tx.hash, "success");
+    } catch (err) {
+      setStatus("❌ Transaction failed: " + err.message, "error");
+    }
+  }
+
+  document.getElementById("investBtn").addEventListener("click", sendBNB);
+
+  function setStatus(msg, type) {
+    const el = document.getElementById("status");
+    el.textContent = msg;
+    el.className = type;
+  }
+</script>
+
+</body>
+</html>
