@@ -1,191 +1,179 @@
-let coins = 0;
-let tg = window.Telegram.WebApp;
+const tg = window.Telegram.WebApp;
 tg.expand();
 
-const telegramUser = tg.initDataUnsafe?.user;
-const telegramId = telegramUser?.id || null;
-const backendURL = "https://backend-dicemint-2vzu.onrender.com";
+const telegramId = tg.initDataUnsafe?.user?.id || null;
+const backendURL = "https://dicemint.onrender.com";
 
-const coinDisplay = document.getElementById("coin-count");
-const balanceDisplay = document.getElementById("balance");
-const message = document.getElementById("message");
+let coins = 0;
 
-// Fetch balance from backend
+// DOM Elements
+const balanceEl = document.getElementById("balance");
+const coinCount = document.getElementById("coin-count");
+const messageEl = document.getElementById("message");
+const refLink = document.getElementById("refLink");
+const copyMsg = document.getElementById("copyMsg");
+const claimBtn = document.getElementById("claim-btn");
+const bonusMsg = document.getElementById("bonus-message");
+
+let groupClicked = false;
+let channelClicked = false;
+
+// Load balance from backend
 function fetchBalance() {
   if (!telegramId) return;
   fetch(`${backendURL}/get_balance`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ telegram_id: telegramId })
+    body: JSON.stringify({ telegram_id: telegramId }),
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       coins = data.balance || 0;
-      updateDisplay();
+      updateUI();
     });
 }
 
-// Sync balance to backend
+function updateUI() {
+  if (balanceEl) balanceEl.textContent = (coins * 0.01).toFixed(2);
+  if (coinCount) coinCount.textContent = "Coins: " + coins;
+}
+
 function syncBalance() {
-  if (!telegramId) return;
   fetch(`${backendURL}/update_balance`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ telegram_id: telegramId, balance: coins })
+    body: JSON.stringify({ telegram_id: telegramId, balance: coins }),
   });
 }
 
-// Update UI
-function updateDisplay() {
-  if (coinDisplay) coinDisplay.textContent = `Coins: ${coins}`;
-  if (balanceDisplay) balanceDisplay.textContent = (coins * 0.01).toFixed(2);
+// Dice Betting
+function playBet() {
+  const amount = parseFloat(document.getElementById("betAmount").value);
+  const guess = parseInt(document.getElementById("guessNumber").value);
+  const dollarBalance = coins * 0.01;
+
+  const resultEl = document.getElementById("bet-result");
+  const dice = document.getElementById("dice");
+
+  if (!amount || amount < 0.01 || amount > dollarBalance) {
+    resultEl.innerHTML = "❌ Invalid amount or insufficient balance.";
+    return;
+  }
+
+  if (!guess || guess < 1 || guess > 6) {
+    resultEl.innerHTML = "❌ Pick a number between 1 and 6.";
+    return;
+  }
+
+  const roll = Math.floor(Math.random() * 6) + 1;
+  drawDice(roll);
+
+  if (guess === roll) {
+    const reward = Math.floor(amount * 200);
+    coins += reward;
+    resultEl.innerHTML = `🎉 You guessed ${roll} correctly! You won $${(reward * 0.01).toFixed(2)}!`;
+  } else {
+    const loss = Math.floor(amount * 100);
+    coins -= loss;
+    resultEl.innerHTML = `😢 Wrong! Dice rolled ${roll}. You lost $${(loss * 0.01).toFixed(2)}.`;
+  }
+
+  updateUI();
   syncBalance();
 }
 
-// Tap to earn
-const tapBtn = document.getElementById("tap-button");
-if (tapBtn) {
-  tapBtn.addEventListener("mousedown", () => {
-    coins++;
-    updateDisplay();
-  });
-  tapBtn.addEventListener("touchstart", () => {
-    coins++;
-    updateDisplay();
-  });
-}
-
-// Withdraw
-function withdraw() {
-  const balance = coins * 0.01;
-  if (balance >= 250) {
-    message.textContent = `✅ Withdrawal of $${balance.toFixed(2)} sent to admin!`;
-    coins = 0;
-    updateDisplay();
-  } else {
-    message.textContent = "❌ You need at least $250 to withdraw.";
-  }
-}
-
-// Dice betting logic
-const dice = document.getElementById("dice");
-const betResult = document.getElementById("bet-result");
-
-function drawDots(number) {
-  const positions = {
-    1: [[50, 50]],
-    2: [[25, 25], [75, 75]],
-    3: [[25, 25], [50, 50], [75, 75]],
-    4: [[25, 25], [75, 25], [25, 75], [75, 75]],
-    5: [[25, 25], [75, 25], [50, 50], [25, 75], [75, 75]],
-    6: [[25, 25], [75, 25], [25, 50], [75, 50], [25, 75], [75, 75]]
+function drawDice(num) {
+  const dice = document.getElementById("dice");
+  const dots = {
+    1: [50],
+    2: [20, 80],
+    3: [20, 50, 80],
+    4: [20, 80, 30, 70],
+    5: [20, 80, 30, 70, 50],
+    6: [20, 80, 30, 70, 25, 75],
   };
-  dice.innerHTML = "";
-  positions[number].forEach(([cx, cy]) => {
-    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    dot.setAttribute("cx", cx);
-    dot.setAttribute("cy", cy);
-    dot.setAttribute("r", 8);
-    dot.setAttribute("class", "dot");
-    dice.appendChild(dot);
+
+  dice.innerHTML = dots[num]
+    .map(
+      (pos, i) =>
+        `<circle cx="${pos}" cy="${dots[num][i + 1] || pos}" r="8" class="dot" />`
+    )
+    .join("");
+}
+
+// Tap to Earn
+if (document.getElementById("tap-button")) {
+  document.getElementById("tap-button").addEventListener("click", () => {
+    coins += 1;
+    updateUI();
+    syncBalance();
+    if (messageEl) messageEl.textContent = "+1 coin earned!";
+    setTimeout(() => {
+      if (messageEl) messageEl.textContent = "";
+    }, 1000);
   });
 }
-drawDots(1);
 
-function playBet() {
-  const bet = parseFloat(document.getElementById("betAmount").value);
-  const guess = parseInt(document.getElementById("guessNumber").value);
-  const balance = coins * 0.01;
-
-  if (balance <= 0) {
-    alert("You don't have enough to bet. Please tap to earn first!");
-    showPage("settings");
-    return;
-  }
-  if (isNaN(bet) || bet <= 0 || bet > balance) {
-    betResult.textContent = "❌ Invalid bet amount.";
-    return;
-  }
-  if (isNaN(guess) || guess < 1 || guess > 6) {
-    betResult.textContent = "❌ Guess a number between 1 and 6.";
-    return;
-  }
-
-  dice.style.transform = "rotate(720deg)";
-  betResult.textContent = "Rolling...";
-
-  setTimeout(() => {
-    const rolled = Math.floor(Math.random() * 6) + 1;
-    drawDots(rolled);
-    dice.style.transform = "rotate(0deg)";
-    if (guess === rolled) {
-      coins += Math.floor(bet * 100);
-      betResult.textContent = `✅ You WON! Dice: ${rolled}`;
-    } else {
-      coins -= Math.floor(bet * 100);
-      betResult.textContent = `❌ You lost! Dice: ${rolled}`;
-    }
-    updateDisplay();
-  }, 800);
+// Referral Link
+if (refLink && telegramId) {
+  refLink.value = `https://t.me/dicemintmonibot/dicemintgameapp?start=${telegramId}`;
 }
 
-// Navigation
-function showPage(id) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+// Copy to Clipboard
+function copyRefLink() {
+  navigator.clipboard.writeText(refLink.value).then(() => {
+    copyMsg.textContent = "✅ Copied!";
+    setTimeout(() => {
+      copyMsg.textContent = "";
+    }, 2000);
+  });
 }
+window.copyRefLink = copyRefLink;
 
 // Claim Bonus
-let groupClicked = false;
-let channelClicked = false;
-
 function checkLinks() {
   if (groupClicked && channelClicked) {
-    const btn = document.getElementById("claim-btn");
-    btn.disabled = false;
-    btn.style.background = "#00ff99";
-    btn.style.color = "#000";
-    btn.onclick = claimBonus;
+    claimBtn.disabled = false;
+    claimBtn.style.background = "#00ff99";
   }
 }
 
-function claimBonus() {
-  if (!telegramId) return;
-  fetch(`${backendURL}/claim_bonus`, {
+if (claimBtn) {
+  claimBtn.addEventListener("click", () => {
+    if (coins >= 1000) {
+      bonusMsg.textContent = "❌ Bonus already claimed.";
+      return;
+    }
+    coins += 1000;
+    updateUI();
+    syncBalance();
+    bonusMsg.textContent = "✅ $10 Bonus added!";
+  });
+}
+
+// Page Navigation
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.remove("active");
+  });
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add("active");
+}
+window.showPage = showPage;
+
+// Check Referral
+const urlParams = new URLSearchParams(window.location.search);
+const ref = urlParams.get("start");
+
+if (ref && telegramId && ref !== telegramId.toString()) {
+  fetch(`${backendURL}/api/referral`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ telegram_id: telegramId })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        coins += 1000;
-        updateDisplay();
-        document.getElementById("bonus-message").textContent = "✅ $10 bonus added!";
-      } else {
-        document.getElementById("bonus-message").textContent = "❌ Bonus already claimed.";
-      }
-    });
-}
-
-// Telegram Info + Referral
-if (telegramUser) {
-  const userInfo = document.createElement("div");
-  userInfo.style = "text-align:center;padding:10px;background:#222;margin:10px;font-size:14px;";
-  userInfo.innerHTML = `👤 Welcome <strong>${telegramUser.first_name}</strong><br>🆔 ID: ${telegramUser.id}<br>📛 Username: @${telegramUser.username || "none"}`;
-  document.body.insertBefore(userInfo, document.body.firstChild);
-
-  const referralLink = `https://t.me/dicemintmonibot/dicemintgameapp?start=${telegramUser.id}`;
-  const refInput = document.getElementById("refLink");
-  if (refInput) refInput.value = referralLink;
-}
-
-function copyRefLink() {
-  const linkInput = document.getElementById("refLink");
-  linkInput.select();
-  linkInput.setSelectionRange(0, 99999);
-  document.execCommand("copy");
-  document.getElementById("copyMsg").textContent = "✅ Link copied!";
+    body: JSON.stringify({
+      referrer_id: ref,
+      new_user_id: telegramId,
+    }),
+  });
 }
 
 // Init
