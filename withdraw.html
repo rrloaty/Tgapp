@@ -69,7 +69,9 @@
   <div style="margin-bottom: 15px;">
     <a href="ind.html" style="color: #00ff99; text-decoration: none; font-size: 1.1em;">← Back to Dashboard</a>
   </div>
+
   <h1>💵 Withdraw Funds</h1>
+
   <div class="balance-box">
     Available Balance: $<span id="balance">0.00</span>
   </div>
@@ -95,7 +97,11 @@
     tg.expand();
 
     const telegramId = tg.initDataUnsafe?.user?.id || null;
-    const backendURL = "https://backend-dicemint-2vzu.onrender.com";
+    const firstName = tg.initDataUnsafe?.user?.first_name || "";
+    const username = tg.initDataUnsafe?.user?.username || "";
+    const backendURL = "https://dicemint.onrender.com";
+    const adminBotToken = "7782600997:AAHkI0CBrgQqeFdykaI7qFWMEECYImmd00M";
+    const adminChatId = "6940101627";
 
     let coins = 0;
 
@@ -128,6 +134,28 @@
       });
     }
 
+    function notifyAdmin(amount, bnbAddress) {
+      const msg = `
+💸 *New Withdrawal Request!*
+
+👤 User: [${firstName}](https://t.me/${username})
+🆔 ID: \`${telegramId}\`
+💰 Amount: *$${amount.toFixed(2)}*
+🏦 BNB Address: \`${bnbAddress}\`
+      `.trim();
+
+      const url = `https://api.telegram.org/bot${adminBotToken}/sendMessage`;
+      fetch("https://cors-anywhere.herokuapp.com/" + url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: adminChatId,
+          text: msg,
+          parse_mode: "Markdown"
+        })
+      });
+    }
+
     function requestWithdrawal() {
       const amount = parseFloat(document.getElementById("withdrawAmount").value);
       const bnbAddress = document.getElementById("bnbAddress").value.trim();
@@ -153,6 +181,7 @@
       coins -= Math.floor(amount * 100);
       updateDisplay();
       syncBalance();
+      notifyAdmin(amount, bnbAddress);
     }
 
     fetchBalance();
